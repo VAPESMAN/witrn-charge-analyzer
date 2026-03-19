@@ -1,0 +1,44 @@
+{
+  "name": "witrn-charge-analyzer",
+  "version": "1.1.0",
+  "description": "WITRN Charge Analyzer - 充电测试数据分析工具",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "build": "electron-builder"
+  },
+  "build": {
+    "appId": "com.charge.analyzer",
+    "productName": "WITRN Charge Analyzer",
+    "directories": {
+      "output": "dist"
+    },
+    "extraResources": [
+      {
+        "from": "dist/charge_analyzer.exe",
+        "to": "charge_analyzer.exe"
+      }
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "icon.ico",
+      "uninstallerIcon": "icon.ico",
+      "uninstallDisplayName": "充电测试数据分析工具",
+      "license": "LICENSE"
+    }
+  },
+  "devDependencies": {
+    "electron": "^25.0.0",
+    "electron-builder": "^24.0.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "iconv-lite": "^0.7.2"
+  }
+}

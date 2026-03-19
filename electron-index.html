@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>充电测试数据分析工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .title-icon {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            color: #212529;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.25);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #6c757d;
+            border: 1.5px solid #ced4da;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .btn-info {
+            background: transparent;
+            color: #764ba2;
+            border: 1.5px solid #d4c5f9;
+            margin-top: 10px;
+        }
+
+        .btn-info:hover {
+            border-color: #764ba2;
+            background: rgba(118, 75, 162, 0.05);
+        }
+
+        /* Spinner animation */
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2.5px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Drag and drop area */
+        .drop-zone {
+            border: 2px dashed #ced4da;
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            background: #fafbfc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .drop-zone:hover {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.03);
+        }
+
+        .drop-zone.drag-over {
+            border-color: #667eea;
+            background: rgba(102, 126, 234, 0.08);
+            transform: scale(1.01);
+        }
+
+        .drop-zone-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .drop-zone-text {
+            font-size: 14px;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .drop-zone-text.has-file {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .drop-zone-hint {
+            font-size: 12px;
+            color: #adb5bd;
+            margin-top: 4px;
+        }
+
+        .drop-zone input[type="file"] {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Result cards */
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            animation: fadeSlideUp 0.5s ease forwards;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result h3 {
+            color: #667eea;
+            margin-bottom: 16px;
+            font-size: 16px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            animation: fadeSlideUp 0.5s ease forwards;
+            opacity: 0;
+        }
+
+        .stat-card:nth-child(1) { animation-delay: 0.05s; }
+        .stat-card:nth-child(2) { animation-delay: 0.1s; }
+        .stat-card:nth-child(3) { animation-delay: 0.15s; }
+        .stat-card:nth-child(4) { animation-delay: 0.2s; }
+
+        .stat-card-icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+
+        .stat-card-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 2px;
+        }
+
+        .stat-card-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .report-path {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            font-size: 12px;
+            color: #495057;
+            word-break: break-all;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .report-path strong {
+            color: #667eea;
+        }
+
+        /* Status animations */
+        .status {
+            margin-top: 20px;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 14px;
+            text-align: center;
+            animation: statusIn 0.4s ease forwards;
+        }
+
+        @keyframes statusIn {
+            from {
+                opacity: 0;
+                transform: translateY(-8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .status-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-info {
+            background: #e8e0f7;
+            color: #4a2d7a;
+            border: 1px solid #d4c5f9;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><span class="title-icon">⚡</span> 充电测试数据分析工具</h1>
+        <p class="subtitle">专业的充电性能分析解决方案</p>
+
+        <div class="form-group">
+            <label class="form-label">📁 选择CSV文件</label>
+            <div class="drop-zone" id="dropZone">
+                <div class="drop-zone-icon">📄</div>
+                <div class="drop-zone-text" id="fileLabel">点击或拖拽CSV文件到此处</div>
+                <div class="drop-zone-hint">支持 .csv 格式</div>
+                <input type="file" id="csvFile" accept=".csv" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">📱 测试机型</label>
+            <input type="text" class="form-control" id="deviceModel" placeholder="例如：小米14Ultra" />
+        </div>
+
+        <button class="btn btn-primary" id="generateBtn">🚀 生成分析报告</button>
+
+        <div class="btn-group">
+            <button class="btn btn-secondary" id="openFolderBtn">📂 打开输出文件夹</button>
+            <button class="btn btn-info" id="helpBtn">❓ 使用帮助</button>
+        </div>
+
+        <div class="status" id="status" style="display: none;"></div>
+
+        <div class="result" id="result" style="display: none;">
+            <h3>✅ 分析结果</h3>
+            <div class="stat-grid" id="statGrid"></div>
+            <div class="report-path" id="reportPath" style="display: none;"></div>
+        </div>
+    </div>
+
+    <script>
+        const { ipcRenderer } = require('electron');
+
+        let selectedFile = null;
+
+        // 文件选择处理
+        document.getElementById('csvFile').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                selectedFile = e.target.files[0].path;
+                const label = document.getElementById('fileLabel');
+                label.textContent = e.target.files[0].name;
+                label.classList.add('has-file');
+            }
+        });
+
+        // 拖拽上传
+        const dropZone = document.getElementById('dropZone');
+
+        dropZone.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add('drag-over');
+        });
+
+        dropZone.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+        });
+
+        dropZone.addEventListener('drop', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove('drag-over');
+
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                const file = files[0];
+                if (file.name.toLowerCase().endsWith('.csv')) {
+                    selectedFile = file.path;
+                    const label = document.getElementById('fileLabel');
+                    label.textContent = file.name;
+                    label.classList.add('has-file');
+                    // 同步更新隐藏的 file input
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    document.getElementById('csvFile').files = dt.files;
+                } else {
+                    showStatus('请拖入CSV格式的文件', 'error');
+                }
+            }
+        });
+
+        // 生成报告
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const btn = this;
+            const deviceModel = document.getElementById('deviceModel').value.trim();
+
+            if (!selectedFile) {
+                showStatus('请选择CSV文件', 'error');
+                return;
+            }
+
+            if (!deviceModel) {
+                showStatus('请输入测试机型', 'error');
+                return;
+            }
+
+            // 设置加载状态
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>处理中...';
+
+            showStatus('正在处理数据，请稍候...', 'info');
+
+            // 发送消息给主进程
+            ipcRenderer.send('generate-report', {
+                csvFile: selectedFile,
+                deviceModel: deviceModel
+            });
+        });
+
+        // 打开输出文件夹
+        document.getElementById('openFolderBtn').addEventListener('click', function() {
+            ipcRenderer.send('open-folder');
+        });
+
+        // 显示帮助
+        document.getElementById('helpBtn').addEventListener('click', function() {
+            ipcRenderer.send('show-help');
+        });
+
+        // 接收主进程消息
+        ipcRenderer.on('report-generated', function(event, data) {
+            console.log('Received data:', data);
+            resetGenerateBtn();
+            showStatus('处理完成！', 'success');
+            showResult(data);
+        });
+
+        ipcRenderer.on('error', function(event, error) {
+            resetGenerateBtn();
+            showStatus(`处理失败: ${error}`, 'error');
+        });
+
+        function resetGenerateBtn() {
+            const btn = document.getElementById('generateBtn');
+            btn.disabled = false;
+            btn.innerHTML = '🚀 生成分析报告';
+        }
+
+        // 显示状态
+        function showStatus(message, type) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = `status status-${type}`;
+            status.style.display = 'block';
+        }
+
+        // 显示结果
+        function showResult(data) {
+            const result = document.getElementById('result');
+            const statGrid = document.getElementById('statGrid');
+            const reportPathEl = document.getElementById('reportPath');
+
+            const cards = [
+                { icon: '📊', value: data.dataPoints || '-', label: '数据点数量' },
+                { icon: '⚡', value: data.maxPower || '-', label: '最大功率' },
+                { icon: '🔋', value: data.maxVoltage || '-', label: '最大电压' },
+                { icon: '🔌', value: data.maxCurrent || '-', label: '最大电流' },
+            ];
+
+            statGrid.innerHTML = cards.map(card => `
+                <div class="stat-card">
+                    <div class="stat-card-icon">${card.icon}</div>
+                    <div class="stat-card-value">${card.value}</div>
+                    <div class="stat-card-label">${card.label}</div>
+                </div>
+            `).join('');
+
+            if (data.reportPath) {
+                reportPathEl.innerHTML = `<strong>报告文件：</strong>${data.reportPath.split('\\').pop()}`;
+                reportPathEl.style.display = 'block';
+            } else {
+                reportPathEl.style.display = 'none';
+            }
+
+            result.style.display = 'block';
+
+            // 询问是否打开报告
+            if (data.reportPath) {
+                if (confirm('报告生成完成，是否打开报告？')) {
+                    ipcRenderer.send('open-report', data.reportPath);
+                }
+            }
+        }
+    </script>
+</body>
+</html>
