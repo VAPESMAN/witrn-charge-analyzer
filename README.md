@@ -25,6 +25,7 @@
 │   ├── result.png           # 分析结果
 │   └── report.png           # HTML报告
 ├── 12-100充电.csv           # 示例数据
+├── example.html            # HTML报告示例
 ├── LICENSE
 └── README.md
 ```
