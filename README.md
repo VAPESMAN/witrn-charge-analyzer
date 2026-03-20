@@ -11,6 +11,10 @@
 - 数据自动降采样，保证大文件流畅渲染
 - 一键打包为独立安装程序，无需Python环境
 
+## 在线预览
+
+[查看示例报告](https://vapesman.github.io/witrn-charge-analyzer/example.html)
+
 ## 项目结构
 
 ```
