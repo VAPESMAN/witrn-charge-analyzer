@@ -89,7 +89,7 @@ Time(hh:mm:ss:ms),Voltage(V),Current(A),Power(W),Temperature
 
 **Q: 为什么安装包这么大？**
 
-安装包约100MB+，主要因为内置了：
+安装包约70MB+，主要因为内置了：
 - **Chromium** - Electron应用的渲染引擎，用于显示Chart.js图表
 - **Python运行时** - 数据分析核心逻辑由Python实现
 
